@@ -11,9 +11,9 @@ PET_STATE = os.path.join(CURR_DIR, "pet_state.pkl")
 class Pet:
     def __init__(self):
         self.name = ""
-        self.health = 99
-        self.happiness = 99
-        self.hunger = 1
+        self.health = 100
+        self.happiness = 100
+        self.hunger = 0
         self.sick = False
         self.last_update_time = time.time()
 
@@ -21,33 +21,43 @@ class Pet:
         self.update_stats()
         self.save_state()
 
-    def stats(self):
-        self.update_stats()
+    def stats(self, outer_call: bool = False):
+        if outer_call:
+            self.update_stats()
         print(f"\n{self.name}'s status:")
         print(f"Health: {self.health}")
         print(f"Happiness: {self.happiness}")
         print(f"Hunger: {self.hunger}")
         if self.sick:
             print(f"{self.name} is sick")
+        if self.hunger >= 90:
+            print(f"{self.name} is hungry")
+        if self.happiness <= 10:
+            print(f"{self.name} is sad")
 
     def update_stats(self):
         current_time = time.time()
         time_elapsed = current_time - self.last_update_time
-
-        self.happiness -= int(time_elapsed * 0.01)
-        self.hunger += int(time_elapsed * 0.01)
+        negative_factor = 0.0
         if self.sick:
-            self.health -= int(time_elapsed * 0.2)
-        elif self.hunger >= 90:
-            self.health -= int(time_elapsed * 0.05)
+            negative_factor += 0.03
+        if self.hunger >= 90:
+            negative_factor += 0.02
+        if self.happiness <= 10:
+            negative_factor += 0.02
+
+        self.happiness -= time_elapsed * 0.01
+        self.hunger += time_elapsed * 0.01
+        if negative_factor > 0:
+            self.health -= time_elapsed * negative_factor
         else:
-            self.health += int(time_elapsed * 0.2)
+            self.health += time_elapsed * 0.05
 
         self.health = max(0, min(self.health, 100))
         self.happiness = max(0, min(self.happiness, 100))
         self.hunger = max(0, min(self.hunger, 100))
 
-        if random.random() < 0.1:
+        if random.random() < 0.01:
             self.handle_random_event()
 
         if self.health <= 0:
@@ -60,11 +70,7 @@ class Pet:
     def handle_random_event(self):
         event_type = random.choice(["sickness", "bonus"])
 
-        if self.hunger <= 0:
-            self.health -= 10
-            self.sick = True
-            print(f"{self.name} got sick from overeating!")
-        elif event_type == "sickness" and not self.sick:
+        if event_type == "sickness" and not self.sick:
             print(f"{self.name} is sick!")
             self.health -= 10
             self.sick = True
@@ -139,7 +145,7 @@ def start():
         elif action == "heal":
             pet.heal()
         elif action == "status":
-            pet.stats()
+            pet.stats(True)
         elif action == "exit":
             pet.save_state()
             print("Bye!")
