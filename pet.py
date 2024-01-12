@@ -23,23 +23,25 @@ class Pet:
 
     def stats(self):
         self.update_stats()
-        print(f"\n{self.name}'s статус:")
-        print(f"Здоровье: {self.health}")
-        print(f"Счастье: {self.happiness}")
-        print(f"Голод: {self.hunger}")
+        print(f"\n{self.name}'s status:")
+        print(f"Health: {self.health}")
+        print(f"Happiness: {self.happiness}")
+        print(f"Hunger: {self.hunger}")
         if self.sick:
-            print("Питомец болен")
+            print(f"{self.name} is sick")
 
     def update_stats(self):
         current_time = time.time()
         time_elapsed = current_time - self.last_update_time
 
-        if not self.sick:
-            self.health += int(time_elapsed * 0.01)
-        else:
-            self.health -= int(time_elapsed * 0.2)
         self.happiness -= int(time_elapsed * 0.01)
         self.hunger += int(time_elapsed * 0.01)
+        if self.sick:
+            self.health -= int(time_elapsed * 0.2)
+        elif self.hunger >= 90:
+            self.health -= int(time_elapsed * 0.05)
+        else:
+            self.health += int(time_elapsed * 0.2)
 
         self.health = max(0, min(self.health, 100))
         self.happiness = max(0, min(self.happiness, 100))
@@ -49,7 +51,7 @@ class Pet:
             self.handle_random_event()
 
         if self.health <= 0:
-            print(f"{self.name} умер!")
+            print(f"{self.name} dead!")
             self.delete_pet_file()
             exit()
 
@@ -61,13 +63,13 @@ class Pet:
         if self.hunger <= 0:
             self.health -= 10
             self.sick = True
-            print(f"{self.name} заболел от переедания!")
+            print(f"{self.name} got sick from overeating!")
         elif event_type == "sickness" and not self.sick:
-            print(f"{self.name} заболел!")
+            print(f"{self.name} is sick!")
             self.health -= 10
             self.sick = True
         elif event_type == "bonus":
-            print(f"{self.name} получил бонус!")
+            print(f"{self.name} got a bonus!")
             self.happiness += 15
             self.happiness = max(0, min(self.happiness, 100))
 
@@ -88,12 +90,12 @@ class Pet:
 
     def heal(self):
         if self.sick:
-            print("Питомец вылечен")
+            print("Pet cured")
             self.sick = False
             self.health += 10
             self.happiness += 5
         else:
-            print("Питомец не болен")
+            print("Pet is not sick")
 
     @staticmethod
     def delete_pet_file(file_name=PET_STATE):
@@ -112,8 +114,8 @@ class Pet:
                 state = pickle.load(file)
                 self.__dict__.update(state)
         except FileNotFoundError:
-            print("Файл состояния не найден. Создан новый питомец.")
-            pet_name = input("Введите имя своего питомца: ")
+            print("Status file not found. New pet created.")
+            pet_name = input("What is your pet's name: ")
             self.name = pet_name
             self.save_state()
 
@@ -126,24 +128,24 @@ def start():
         pet.update_stats()
         pet.stats()
 
-        action = input("Выберите действие (кормить/играть/спать/лечить/состояние/выйти): ").lower()
+        action = input("Choose action (feed/play/sleep/heal/status/exit): ").lower()
 
-        if action == "кормить":
+        if action == "feed":
             pet.feed()
-        elif action == "играть":
+        elif action == "play":
             pet.play()
-        elif action == "спать":
+        elif action == "sleep":
             pet.sleep()
-        elif action == "лечить":
+        elif action == "heal":
             pet.heal()
-        elif action == "состояние":
+        elif action == "status":
             pet.stats()
-        elif action == "выйти":
+        elif action == "exit":
             pet.save_state()
-            print("До свидания!")
+            print("Bye!")
             break
         else:
-            print("Неверное действие. Попробуйте еще раз.")
+            print("Wrong action. Please try again.")
 
         pet.save_state()
         time.sleep(1)
