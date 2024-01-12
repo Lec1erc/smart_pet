@@ -57,7 +57,7 @@ class Pet:
         self.happiness = max(0, min(self.happiness, 100))
         self.hunger = max(0, min(self.hunger, 100))
 
-        if random.random() < 0.01:
+        if random.random() < 0.1:
             self.handle_random_event()
 
         if self.health <= 0:
@@ -76,8 +76,8 @@ class Pet:
             self.sick = True
         elif event_type == "bonus":
             print(f"{self.name} got a bonus!")
-            self.happiness += 15
-            self.happiness = max(0, min(self.happiness, 100))
+            # self.happiness += 15
+            # self.happiness = max(0, min(self.happiness, 100))
 
     def feed(self):
         self.hunger -= 10

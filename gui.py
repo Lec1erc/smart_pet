@@ -1,46 +1,53 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from threading import Thread
 import time
+
 
 class PetGUI:
     def __init__(self, pet):
         self.pet = pet
 
         self.root = tk.Tk()
-        self.root.title("Virtual Pet")
+        self.root.title(self.pet.name)
 
-        self.health_label = tk.Label(self.root, text="Health:")
+        center_frame = tk.Frame(self.root)
+        center_frame.pack(expand=True, fill="both", padx=20, pady=20)
+
+        self.health_label = tk.Label(center_frame, text="Health:")
         self.health_label.grid(row=0, column=0, padx=10)
-        self.health_progress = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="determinate")
+        self.health_progress = ttk.Progressbar(center_frame, orient="horizontal", length=200, mode="determinate")
         self.health_progress.grid(row=0, column=1, pady=10)
 
-        self.happiness_label = tk.Label(self.root, text="Happiness:")
+        self.happiness_label = tk.Label(center_frame, text="Happiness:")
         self.happiness_label.grid(row=1, column=0, padx=10)
-        self.happiness_progress = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="determinate")
+        self.happiness_progress = ttk.Progressbar(center_frame, orient="horizontal", length=200, mode="determinate")
         self.happiness_progress.grid(row=1, column=1, pady=10)
 
-        self.hunger_label = tk.Label(self.root, text="Hunger:")
+        self.hunger_label = tk.Label(center_frame, text="Hunger:")
         self.hunger_label.grid(row=2, column=0, padx=10)
-        self.hunger_progress = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="determinate")
+        self.hunger_progress = ttk.Progressbar(center_frame, orient="horizontal", length=200, mode="determinate")
         self.hunger_progress.grid(row=2, column=1, pady=10)
 
-        self.status_label = tk.Label(self.root, text="", font=("Helvetica", 12))
+        self.status_label = tk.Label(center_frame, text="", font=("Helvetica", 12))
         self.status_label.grid(row=3, column=0, columnspan=2, pady=10)
 
-        self.feed_button = tk.Button(self.root, text="Feed", command=self.feed_pet)
-        self.feed_button.grid(row=4, column=0, pady=5)
+        button_frame = tk.Frame(center_frame)
+        button_frame.grid(row=4, column=0, columnspan=2, pady=5)
 
-        self.play_button = tk.Button(self.root, text="Play", command=self.play_pet)
-        self.play_button.grid(row=4, column=1, pady=5)
+        self.feed_button = tk.Button(button_frame, text="Feed", command=self.feed_pet)
+        self.feed_button.pack(side=tk.LEFT, padx=5)
 
-        self.sleep_button = tk.Button(self.root, text="Sleep", command=self.sleep_pet)
-        self.sleep_button.grid(row=5, column=0, pady=5)
+        self.play_button = tk.Button(button_frame, text="Play", command=self.play_pet)
+        self.play_button.pack(side=tk.LEFT, padx=5)
 
-        self.heal_button = tk.Button(self.root, text="Heal", command=self.heal_pet)
-        self.heal_button.grid(row=5, column=1, pady=5)
+        self.sleep_button = tk.Button(button_frame, text="Sleep", command=self.sleep_pet)
+        self.sleep_button.pack(side=tk.LEFT, padx=5)
 
-        self.exit_button = tk.Button(self.root, text="Exit", command=self.exit_program)
+        self.heal_button = tk.Button(button_frame, text="Heal", command=self.heal_pet)
+        self.heal_button.pack(side=tk.LEFT, padx=5)
+
+        self.exit_button = tk.Button(center_frame, text="Exit", command=self.exit_program)
         self.exit_button.grid(row=7, column=0, columnspan=2, pady=5)
 
         self.update_status_thread = Thread(target=self.update_status_thread)
@@ -49,8 +56,12 @@ class PetGUI:
         self.root.mainloop()
 
     def update_status_thread(self):
+        iteration = 0
         while True:
+            iteration += 1
+            print(iteration)
             time.sleep(1)
+
             self.pet.update_stats()
             self.show_status()
 
