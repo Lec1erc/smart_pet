@@ -56,12 +56,8 @@ class PetGUI:
         self.root.mainloop()
 
     def update_status_thread(self):
-        iteration = 0
         while True:
-            iteration += 1
-            print(iteration)
             time.sleep(1)
-
             self.pet.update_stats()
             self.show_status()
 

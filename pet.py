@@ -57,7 +57,7 @@ class Pet:
         self.happiness = max(0, min(self.happiness, 100))
         self.hunger = max(0, min(self.hunger, 100))
 
-        if random.random() < 0.1:
+        if random.random() < 0.01:
             self.handle_random_event()
 
         if self.health <= 0:
